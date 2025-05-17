@@ -13,10 +13,12 @@ ISO_DOWNLOAD_URL="https://mirror.rackspace.com/archlinux/iso/latest/archlinux-x8
 
 mkdir -p "$(dirname "$ARCH_ISO_PATH")"
 
+sudo apt update
+sudo apt upgrade -y
+
 echo "1. Kiểm tra và cài Docker..."
 if ! command -v docker &>/dev/null; then
   echo "Docker chưa cài, tiến hành cài..."
-  sudo apt update
   sudo apt install -y docker.io
   sudo systemctl enable --now docker
 else
@@ -91,6 +93,12 @@ EOF
 echo "8. Khởi động container Arch Linux..."
 sudo docker-compose -f $COMPOSE_FILE up -d
 
-echo "Hoàn tất! Bạn có thể kết nối Arch Linux container qua cổng 2223 (SSH)."
-echo "Bạn cần đặt mật khẩu root trong container lần đầu tiên:"
-echo "  sudo docker exec -it $CONTAINER_NAME passwd"
+echo "9. Đặt mật khẩu root mặc định là 'root' (có thể đổi sau)..."
+sleep 3
+sudo docker exec -it $CONTAINER_NAME bash -c "echo root:root | chpasswd"
+
+echo
+echo "🎉 Hoàn tất! Bạn có thể SSH vào container bằng lệnh:"
+echo "  ssh root@localhost -p 2223"
+echo "🔑 Mật khẩu mặc định: root"
+echo "🛡️ Hãy đổi mật khẩu ngay sau khi đăng nhập nếu cần!"
