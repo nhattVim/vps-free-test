@@ -1,16 +1,16 @@
 #!/bin/bash
 set -e
 
-WINDOWS_ISO_PATH="$HOME/Downloads/Win10_21H2_English_x64.iso" # chỉnh lại nếu cần
-COMPOSE_FILE="windows10.yml"
-CONTAINER_NAME="windows"
-RAM_SIZE="4G"
+ARCH_ISO_PATH="$HOME/Downloads/archlinux-x86_64.iso"
+COMPOSE_FILE="archlinux.yml"
+CONTAINER_NAME="archlinux"
+RAM_SIZE="2G"
 CPU_CORES="2"
-DISK_SIZE="30G"
-DISK2_SIZE="10G"
-ISO_DOWNLOAD_URL="https://software-download.microsoft.com/pr/Win10_21H2_English_x64.iso" # Microsoft official
+DISK_SIZE="20G"
+DISK2_SIZE="5G"
+ISO_DOWNLOAD_URL="https://mirror.rackspace.com/archlinux/iso/latest/archlinux-x86_64.iso"
 
-mkdir -p "$(dirname "$WINDOWS_ISO_PATH")"
+mkdir -p "$(dirname "$ARCH_ISO_PATH")"
 
 echo "1. Kiểm tra và cài Docker..."
 if ! command -v docker &>/dev/null; then
@@ -41,46 +41,39 @@ sudo chgrp kvm /dev/kvm
 sudo chmod 660 /dev/kvm
 sudo usermod -aG kvm $USER || true
 
-echo "4. Kiểm tra file ISO Windows tồn tại..."
-if [ ! -f "$WINDOWS_ISO_PATH" ]; then
-  echo "Không tìm thấy file ISO Windows tại $WINDOWS_ISO_PATH"
-  echo "Bắt đầu tải bản ISO Windows 10 21H2 từ Microsoft chính thức..."
-  wget --continue --show-progress -O "$WINDOWS_ISO_PATH" "$ISO_DOWNLOAD_URL"
-  echo "Đã tải xong ISO Windows 10."
+echo "4. Kiểm tra file ISO Arch Linux tồn tại..."
+if [ ! -f "$ARCH_ISO_PATH" ]; then
+  echo "Không tìm thấy file ISO Arch Linux tại $ARCH_ISO_PATH"
+  echo "Bắt đầu tải bản ISO Arch Linux mới nhất từ mirror chính thức..."
+  wget --continue --show-progress -O "$ARCH_ISO_PATH" "$ISO_DOWNLOAD_URL"
+  echo "Đã tải xong ISO Arch Linux."
 fi
 
 echo "5. Tạo file docker-compose $COMPOSE_FILE"
 cat > $COMPOSE_FILE <<EOF
-version: '3.8'
-
 services:
-  windows:
-    image: dockurr/windows
+  archlinux:
+    image: archlinux
     container_name: $CONTAINER_NAME
     environment:
-      VERSION: "10"
-      USERNAME: "MASTER"
-      PASSWORD: "admin@123"
       RAM_SIZE: "$RAM_SIZE"
       CPU_CORES: "$CPU_CORES"
       DISK_SIZE: "$DISK_SIZE"
       DISK2_SIZE: "$DISK2_SIZE"
-      ISO_URL: ""  # bỏ vì dùng ISO mount thủ công
     devices:
       - /dev/kvm
       - /dev/net/tun
     cap_add:
       - NET_ADMIN
     volumes:
-      - $WINDOWS_ISO_PATH:/ISO/Win10.iso:ro
+      - $ARCH_ISO_PATH:/ISO/archlinux-x86_64.iso:ro
     ports:
-      - "8006:8006"
-      - "3389:3389/tcp"
-      - "3389:3389/udp"
+      - "2223:22/tcp"
     stop_grace_period: 2m
 EOF
 
-echo "6. Khởi động container Windows..."
+
+echo "6. Khởi động container Arch Linux..."
 sudo docker-compose -f $COMPOSE_FILE up -d
 
-echo "Hoàn tất! Bạn có thể kết nối Windows container qua cổng 3389 (RDP)."
+echo "Hoàn tất! Bạn có thể kết nối Arch Linux container qua cổng 2223 (SSH)."
