@@ -1,0 +1,19 @@
+services:
+  archlinux:
+    image: archlinux-sshd
+    container_name: archlinux
+    environment:
+      RAM_SIZE: "2G"
+      CPU_CORES: "2"
+      DISK_SIZE: "20G"
+      DISK2_SIZE: "5G"
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - /home/codespace/Downloads/archlinux-x86_64.iso:/ISO/archlinux-x86_64.iso:ro
+    ports:
+      - "2223:22/tcp"
+    stop_grace_period: 2m

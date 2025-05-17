@@ -2,6 +2,7 @@
 set -e
 
 ARCH_ISO_PATH="$HOME/Downloads/archlinux-x86_64.iso"
+DOCKERFILE="Dockerfile.arch"
 COMPOSE_FILE="archlinux.yml"
 CONTAINER_NAME="archlinux"
 RAM_SIZE="2G"
@@ -49,11 +50,26 @@ if [ ! -f "$ARCH_ISO_PATH" ]; then
   echo "Đã tải xong ISO Arch Linux."
 fi
 
-echo "5. Tạo file docker-compose $COMPOSE_FILE"
+echo "5. Tạo Dockerfile $DOCKERFILE để build image Arch Linux có SSH server"
+cat > $DOCKERFILE <<EOF
+FROM archlinux:latest
+
+RUN pacman -Syu --noconfirm openssh \\
+    && ssh-keygen -A
+
+EXPOSE 22
+
+CMD ["/usr/sbin/sshd","-D","-e"]
+EOF
+
+echo "6. Build Docker image archlinux-sshd..."
+sudo docker build -t archlinux-sshd -f $DOCKERFILE .
+
+echo "7. Tạo file docker-compose $COMPOSE_FILE"
 cat > $COMPOSE_FILE <<EOF
 services:
   archlinux:
-    image: archlinux
+    image: archlinux-sshd
     container_name: $CONTAINER_NAME
     environment:
       RAM_SIZE: "$RAM_SIZE"
@@ -72,8 +88,9 @@ services:
     stop_grace_period: 2m
 EOF
 
-
-echo "6. Khởi động container Arch Linux..."
+echo "8. Khởi động container Arch Linux..."
 sudo docker-compose -f $COMPOSE_FILE up -d
 
 echo "Hoàn tất! Bạn có thể kết nối Arch Linux container qua cổng 2223 (SSH)."
+echo "Bạn cần đặt mật khẩu root trong container lần đầu tiên:"
+echo "  sudo docker exec -it $CONTAINER_NAME passwd"
