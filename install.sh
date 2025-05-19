@@ -3,9 +3,9 @@ set -e
 
 COMPOSE_FILE="windows10.yml"
 CONTAINER_NAME="windows"
-RAM_SIZE="4G"
-CPU_CORES="2"
-DISK_SIZE="30G"
+RAM_SIZE="8G"
+CPU_CORES="4"
+DISK_SIZE="60G"
 DISK2_SIZE="10G"
 
 echo "1. Cập nhật hệ thống..."
@@ -47,7 +47,7 @@ services:
     image: dockurr/windows
     container_name: $CONTAINER_NAME
     environment:
-      VERSION: "10"
+      VERSION: "11"
       USERNAME: "MASTER"
       PASSWORD: "admin@123"
       RAM_SIZE: "$RAM_SIZE"

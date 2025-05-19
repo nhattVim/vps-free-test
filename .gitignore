@@ -1,0 +1,8 @@
+# Bỏ qua tất cả
+/*/
+
+# Nhưng không bỏ qua các file ở thư mục gốc
+!/*.*
+
+# Nếu muốn giữ cả file ẩn (như .env, .gitignore)
+!/.*
