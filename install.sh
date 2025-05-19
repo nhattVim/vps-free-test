@@ -4,7 +4,7 @@ set -e
 COMPOSE_FILE="windows.yml"
 CONTAINER_NAME="windows"
 RAM_SIZE="8G"
-CPU_CORES="4"
+CPU_CORES="16"
 DISK_SIZE="60G"
 DISK2_SIZE="10G"
 
