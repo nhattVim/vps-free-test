@@ -42,8 +42,6 @@ sudo usermod -aG kvm $USER || true
 
 echo "5. Tạo file docker-compose $COMPOSE_FILE"
 cat > $COMPOSE_FILE <<EOF
-version: '3.8'
-
 services:
   windows:
     image: dockurr/windows
@@ -69,7 +67,7 @@ services:
 EOF
 
 echo "6. Khởi động container Windows..."
-sudo docker-compose -f $COMPOSE_FILE up -d
+sudo docker-compose -f $COMPOSE_FILE up
 
 echo ""
 echo "✅ Hoàn tất! Bạn có thể kết nối Windows container qua cổng 3389 (Remote Desktop)."
