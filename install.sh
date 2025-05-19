@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-COMPOSE_FILE="windows10.yml"
+COMPOSE_FILE="windows.yml"
 CONTAINER_NAME="windows"
 RAM_SIZE="8G"
 CPU_CORES="4"
@@ -63,6 +63,8 @@ services:
       - "8006:8006"
       - "3389:3389/tcp"
       - "3389:3389/udp"
+    volumes:
+      - ./windows:/storage
     stop_grace_period: 2m
 EOF
 
